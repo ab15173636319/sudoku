@@ -27,9 +27,9 @@
       </view>
 
       <view class="action-buttons">
-        <nut-button type="default" shape="square" size="normal" @click="undo">撤销</nut-button>
-        <nut-button type="default" shape="square" size="normal" @click="clear">清除</nut-button>
-        <nut-button type="default" shape="square" size="normal" @click="restart">重新开始</nut-button>
+        <nut-button type="warning" size="normal" @click="undo">撤销</nut-button>
+        <nut-button type="danger" size="normal" @click="clear">清除</nut-button>
+        <nut-button type="default" size="normal" @click="restart">重新开始</nut-button>
       </view>
 
       <view class="number-pad">
@@ -651,7 +651,8 @@ onUnmounted(() => {
 .action-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 0 20px;
+  // padding: 0 20px;
+  gap: 10px;
   margin: 40px 0;
 }
 </style>
