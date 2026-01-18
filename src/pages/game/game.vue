@@ -34,7 +34,8 @@
 
       <view class="number-pad">
         <view class="numberBoard">
-          <view v-for="num in 9" :key="num" class="number-btn" @click="inputNumber(num)">
+          <view v-for="num in 9" :key="num" class="number-btn" :class="{ 'disabled': !canInputNumber(num) }"
+            @click="inputNumber(num)">
             {{ num }}
           </view>
         </view>
@@ -46,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted } from 'vue';
+import { ref, onUnmounted, onMounted, computed } from 'vue';
 import Taro, { useLoad } from '@tarojs/taro';
 import {
   generateSudoku,
@@ -177,6 +178,92 @@ const hasErrors = (): boolean => {
     }
   }
   return false;
+};
+
+// 获取选中单元格所在行、列、九宫格中已填入的数字
+const getUsedNumbers = (): Set<number> => {
+  const used = new Set<number>();
+
+  if (selectedRow.value === -1 || selectedCol.value === -1) {
+    return used;
+  }
+
+  const row = selectedRow.value;
+  const col = selectedCol.value;
+
+  // 检查行中已填入的数字
+  for (let j = 0; j < 9; j++) {
+    if (j !== col && board.value[row][j].value !== null) {
+      used.add(board.value[row][j].value!);
+    }
+  }
+
+  // 检查列中已填入的数字
+  for (let i = 0; i < 9; i++) {
+    if (i !== row && board.value[i][col].value !== null) {
+      used.add(board.value[i][col].value!);
+    }
+  }
+
+  // 检查九宫格中已填入的数字
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let i = boxRow; i < boxRow + 3; i++) {
+    for (let j = boxCol; j < boxCol + 3; j++) {
+      if ((i !== row || j !== col) && board.value[i][j].value !== null) {
+        used.add(board.value[i][j].value!);
+      }
+    }
+  }
+
+  return used;
+};
+
+// 检查行和列是否都已填完
+const isRowAndColFilled = computed(() => {
+  if (selectedRow.value === -1 || selectedCol.value === -1) {
+    return false;
+  }
+
+  const row = selectedRow.value;
+  const col = selectedCol.value;
+
+  // 检查行是否已填完
+  let rowFilled = true;
+  for (let j = 0; j < 9; j++) {
+    if (board.value[row][j].value === null) {
+      rowFilled = false;
+      break;
+    }
+  }
+
+  // 检查列是否已填完
+  let colFilled = true;
+  for (let i = 0; i < 9; i++) {
+    if (board.value[i][col].value === null) {
+      colFilled = false;
+      break;
+    }
+  }
+
+  return rowFilled && colFilled;
+});
+
+// 判断是否可以输入某个数字
+const canInputNumber = (num: number): boolean => {
+  // 如果没选中单元格，所有数字都可用
+  if (selectedRow.value === -1 || selectedCol.value === -1) {
+    return true;
+  }
+
+  // 如果行和列没填完，所有数字都可用
+  if (!isRowAndColFilled.value) {
+    return true;
+  }
+
+  // 如果行和列都填完了，只允许输入未使用的数字
+  const usedNumbers = getUsedNumbers();
+  return !usedNumbers.has(num);
 };
 
 // 输入数字
@@ -645,6 +732,19 @@ onUnmounted(() => {
   &:active {
     transform: scale(0.95);
     background-color: #e0e0e0;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+    color: #999;
+    pointer-events: none;
+
+    &:active {
+      transform: none;
+      background-color: #f5f5f5;
+    }
   }
 }
 
