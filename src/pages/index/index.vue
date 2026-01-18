@@ -15,7 +15,49 @@
           </template>
         </nut-button>
       </view>
+
+      <view class="rules-section">
+        <nut-button type="default" size="normal" plain @click="showRules = true">规则说明</nut-button>
+      </view>
     </view>
+
+    <!-- 规则说明弹框 -->
+    <nut-popup v-model:visible="showRules" position="center" round closeable
+      :style="{ width: '90%', maxWidth: '500px' }">
+      <view class="rules-popup">
+        <view class="rules-header">
+          <view class="rules-title">游戏规则</view>
+        </view>
+        <view class="rules-content">
+          <view class="rule-item">
+            <view class="rule-title">📋 基本规则</view>
+            <view class="rule-text">数独是一个9×9的网格游戏，目标是用数字1-9填满所有空格。</view>
+          </view>
+          <view class="rule-item">
+            <view class="rule-title">✅ 填写规则</view>
+            <view class="rule-text">每一行、每一列、每一个3×3的九宫格内，数字1-9都必须出现且只能出现一次。</view>
+          </view>
+          <view class="rule-item">
+            <view class="rule-title">🎮 操作方法</view>
+            <view class="rule-text">• 点击空格选中单元格<br />• 点击数字键盘输入数字<br />• 按数字键1-9或点击数字按钮输入<br />•
+              按Delete键或点击删除按钮清除<br />•
+              使用撤销功能返回上一步</view>
+          </view>
+          <view class="rule-item">
+            <view class="rule-title">⚠️ 错误提示</view>
+            <view class="rule-text">• 错误的数字会显示为红色<br />• 存在错误时无法继续填写其他格子<br />• 必须先修正所有错误才能继续游戏</view>
+          </view>
+          <view class="rule-item">
+            <view class="rule-title">🎯 完成条件</view>
+            <view class="rule-text">当所有空格都被正确填写，且符合数独规则时，游戏完成。九宫格完成时会有动画提示。</view>
+          </view>
+          <view class="rule-item">
+            <view class="rule-title">📊 难度说明</view>
+            <view class="rule-text">• 简单：30个空格<br />• 中等：40个空格<br />• 困难：48个空格<br />• 专家：56个空格</view>
+          </view>
+        </view>
+      </view>
+    </nut-popup>
 
     <!-- 设置弹框 -->
     <nut-popup v-model:visible="showSettings" position="bottom" :style="{ height: '80%' }" round closeable
@@ -93,6 +135,7 @@ import { getThemeMode, setThemeMode } from '../../utils/theme';
 
 const show = ref(false);
 const showSettings = ref(false);
+const showRules = ref(false);
 const showThemePicker = ref(false);
 const currentDiff = ref("1");
 const currentDiffValue = ref("简单");
@@ -216,7 +259,63 @@ onMounted(() => {
       padding: 0 10px;
       margin-top: 100px;
     }
+
+    .rules-section {
+      width: 100%;
+      display: flex;
+      justify-content: right;
+      align-items: center;
+      padding: 20px 10px;
+      margin-top: 30px;
+    }
   }
+}
+
+.rules-popup {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+.rules-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.rules-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.rules-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.rule-item {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.rule-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.rule-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
 }
 
 .settings-popup {
