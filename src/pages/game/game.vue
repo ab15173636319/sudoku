@@ -167,6 +167,18 @@ const selectCell = (row: number, col: number) => {
   }
 };
 
+// 检查棋盘是否有错误
+const hasErrors = (): boolean => {
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (board.value[i][j].isError) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
 // 输入数字
 const inputNumber = (num: number) => {
   if (selectedRow.value === -1 || selectedCol.value === -1) {
@@ -177,9 +189,15 @@ const inputNumber = (num: number) => {
   const cell = board.value[selectedRow.value][selectedCol.value];
   if (cell.isFixed) return;
 
-  // 如果当前单元格有错误，禁止继续输入，必须先删除
-  if (cell.isError) {
-    Taro.showToast({ title: '请先删除错误值', icon: 'none' });
+  // 先验证当前棋盘状态，检查是否有错误
+  validateBoard(board.value, solution.value);
+
+  // 检查当前选中的格子是否有错误（允许修正错误）
+  const isCorrectingError = cell.isError;
+
+  // 如果棋盘中有错误，且当前格子没有错误，则禁止继续填写（必须先修正错误）
+  if (hasErrors() && !isCorrectingError) {
+    Taro.showToast({ title: '请先修正错误再继续', icon: 'none', duration: 2000 });
     return;
   }
 
@@ -509,12 +527,6 @@ onUnmounted(() => {
   &.error {
     color: #ff4444;
     background-color: #ffe6e6;
-    cursor: not-allowed;
-
-    &.selected {
-      background-color: #ffe6e6;
-      border: 2px solid #ff4444;
-    }
   }
 
   &.selected {
